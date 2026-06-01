@@ -632,11 +632,11 @@ body{font-family:'Barlow',sans-serif;background:var(--gd);color:var(--ink);min-h
 <div class="footer"><p>🍀 <em>Ireland 2026</em> &nbsp;·&nbsp; The Juniors vs The Piercers &nbsp;·&nbsp; May the best team win</p></div>
 
 <script>
-/* ============================================================
-   PUB / RESTAURANT DATA — sourced from live searches
-   Sources: McKenna's Guides (MK), Irish Times (IT),
-            Michelin Guide (MI), Verified Online (VA)
-   ============================================================ */
+/* ================================================================
+   IRELAND 2026 — COMPLETE SCRIPT (single clean version)
+   ================================================================ */
+
+/* ---------- DATA ---------- */
 const PUBS_BY_CITY = [
   {
     city:"Dublin Area", nights:"Sep 11–13 · Roganstown",
@@ -725,9 +725,6 @@ const PUBS_BY_CITY = [
   }
 ];
 
-/* ============================================================
-   DAY DATA
-   ============================================================ */
 const DAYS = [
   {idx:0,date:"Sep 11",dow:"Thursday",title:"Arrival via Dublin",eyebrow:"Day 1 — Travel Day",badge:"Travel Day",badgeCls:"bdg-drive",drive:"Via Dublin Airport",hotel:"Roganstown Hotel",hotelUrl:"https://www.roganstown.com",hotelNote:"A relaxed resort hotel north of Dublin, close to the airport and County Louth. Good bar, comfortable rooms, easy first night.",courses:[],pubsCity:0,note:"Arrival day — get settled, find a pub, and get ready. The adventure starts tomorrow.",prev:null,next:1},
   {idx:1,date:"Sep 12",dow:"Saturday",title:"County Louth",eyebrow:"Day 2 — Round 1",badge:"Night 1 — Roganstown",badgeCls:"bdg-lodge",drive:"45 min",hotel:"Roganstown Hotel",hotelUrl:"https://www.roganstown.com",hotelNote:"Your base for the first two nights — relaxed resort hotel north of Dublin, close to County Louth.",courses:[{name:"County Louth (Baltray)",tee:"12:50 PM",type:"Links",typeCls:"ct-links",banner:"links",loc:"Baltray, Co. Louth",yards:"6,936",par:"73",est:"Est. 1892",desc:"Known simply as 'Baltray,' one of Ireland's most beloved hidden gems — set on the Boyne Estuary with classic duneland terrain, superb greens, and almost no crowds. A perfect warm-up opener.",tags:["Duneland","Boyne Estuary","Hidden gem"],know:"The par-5 17th is a brute. Wind off the estuary can shift mid-round. Greens are fast and true. A wonderful first taste of proper Irish links golf."}],pubsCity:0,note:"Round 1 is in the books. An afternoon tee time means a relaxed morning — enjoy it. Bigger days are coming.",prev:0,next:2},
@@ -741,9 +738,6 @@ const DAYS = [
   {idx:9,date:"Sep 20",dow:"Sunday",title:"Fly Home from Dublin",eyebrow:"Day 10 — Departure Day",badge:"Departure Day",badgeCls:"bdg-drive",drive:"Dublin Airport",hotel:"",hotelUrl:"",hotelNote:"",courses:[],pubsCity:4,note:"Depart 9:00 AM from Dublin. The trip of a lifetime is complete — 13 rounds, 10 days, 4 mates, and more stories than you can count. Safe travels.",prev:8,next:null}
 ];
 
-/* ============================================================
-   SCORECARD
-   ============================================================ */
 const ROUNDS=[
   {d:"Sep 12",c:"County Louth"},{d:"Sep 13",c:"Corballis"},{d:"Sep 13",c:"Portmarnock"},
   {d:"Sep 14",c:"Royal County Down"},{d:"Sep 14",c:"RCD Annesley"},
@@ -751,11 +745,35 @@ const ROUNDS=[
   {d:"Sep 17",c:"Ballyliffin Glashedy"},{d:"Sep 18",c:"St. Patrick's (Rosapenna)"},{d:"Sep 18",c:"Sandy Hills (Rosapenna)"},
   {d:"Sep 19",c:"Cruit Island"},{d:"Sep 19",c:"Narin & Portnoo"}
 ];
-let res={};
 
-/* ============================================================
-   COURSE CARD HTML HELPER
-   ============================================================ */
+const SC_DAYS = [
+  {date:"Sep 12", courses:"County Louth"},
+  {date:"Sep 13", courses:"Corballis / Jameson Links + Portmarnock"},
+  {date:"Sep 14", courses:"Royal County Down + RCD Annesley"},
+  {date:"Sep 15", courses:"Royal Portrush — Dunluce"},
+  {date:"Sep 16", courses:"Portstewart + Castlerock"},
+  {date:"Sep 17", courses:"Ballyliffin Glashedy"},
+  {date:"Sep 18", courses:"St. Patrick's + Sandy Hills"},
+  {date:"Sep 19", courses:"Cruit Island + Narin & Portnoo"}
+];
+
+const HCAP_COURSES = [
+  {date:"Sep 12", course:"County Louth (Baltray)",   rating:74.4, slope:131, par:73, note:"White tees"},
+  {date:"Sep 13", course:"Jameson Links",             rating:73.5, slope:130, par:72, note:"White tees"},
+  {date:"Sep 13", course:"Portmarnock GC",            rating:76.5, slope:143, par:72, note:"Blue / championship tees"},
+  {date:"Sep 14", course:"Royal County Down",         rating:75.0, slope:142, par:71, note:"Championship tees"},
+  {date:"Sep 14", course:"RCD Annesley",              rating:68.5, slope:118, par:66, note:"Estimated — no official WHS rating"},
+  {date:"Sep 15", course:"Royal Portrush — Dunluce",  rating:74.5, slope:136, par:71, note:"Medal / visitor tees"},
+  {date:"Sep 16", course:"Portstewart Strand",        rating:74.1, slope:135, par:72, note:"Championship tees"},
+  {date:"Sep 16", course:"Castlerock",                rating:72.2, slope:128, par:73, note:"Medal tees"},
+  {date:"Sep 17", course:"Ballyliffin Glashedy",      rating:75.1, slope:136, par:72, note:"Blue / championship tees"},
+  {date:"Sep 18", course:"St. Patrick's (Rosapenna)", rating:72.8, slope:128, par:71, note:"Medal tees"},
+  {date:"Sep 18", course:"Sandy Hills (Rosapenna)",   rating:73.6, slope:130, par:71, note:"Medal tees"},
+  {date:"Sep 19", course:"Cruit Island",              rating:64.5, slope:108, par:68, note:"9-hole layout played twice"},
+  {date:"Sep 19", course:"Narin & Portnoo",           rating:70.8, slope:122, par:69, note:"Medal tees"}
+];
+
+/* ---------- HELPERS ---------- */
 function courseCardHTML(c, label){
   return `<div class="copt-label">${label}</div>
   <div class="dd-course">
@@ -787,7 +805,6 @@ function switchCourseOpt(dayIdx, opt, btn){
   btn.classList.add('active');
 }
 
-
 function pubHTML(p){
   const nameEl = p.url
     ? `<a class="pub-name-link" href="${p.url}" target="_blank" rel="noopener">${p.name}</a>`
@@ -800,7 +817,7 @@ function pubHTML(p){
   </div>`;
 }
 
-/* Build Pubs tab */
+/* ---------- BUILD PUBS TAB ---------- */
 function buildPubsTab(){
   let html='';
   PUBS_BY_CITY.forEach(c=>{
@@ -812,10 +829,8 @@ function buildPubsTab(){
   document.getElementById('pubs-tab-content').innerHTML=html;
 }
 
-/* ============================================================
-   TAB NAV
-   ============================================================ */
-function showTab(id,el){
+/* ---------- TAB NAV ---------- */
+function showTab(id, el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
@@ -824,9 +839,7 @@ function showTab(id,el){
   window.scrollTo(0,0);
 }
 
-/* ============================================================
-   DAY DETAIL
-   ============================================================ */
+/* ---------- DAY DETAIL ---------- */
 function openDay(idx){
   const d=DAYS[idx];
   document.getElementById('dd-eyebrow').textContent=d.eyebrow;
@@ -836,7 +849,7 @@ function openDay(idx){
   [{icon:'📅',text:d.date+' · '+d.dow},
    d.drive?{icon:'🚗',text:d.drive}:null,
    d.hotel?{icon:'🏨',text:d.hotel}:null,
-   d.courses.length?{icon:'⛳',text:d.courses.length+' Round'+(d.courses.length>1?'s':'')}:null
+   d.courses&&d.courses.length?{icon:'⛳',text:d.courses.length+' Round'+(d.courses.length>1?'s':'')}:null
   ].filter(Boolean).forEach(c=>{
     const el=document.createElement('div');
     el.className='dd-chip';
@@ -845,12 +858,12 @@ function openDay(idx){
   });
 
   let html='';
-
   if(d.note) html+=`<div class="dd-block"><div class="dd-daynote">${d.note}</div></div>`;
 
-  if(d.courses.length){
+  const courses = d.courses||[];
+  if(courses.length){
     html+=`<div class="dd-block"><div class="dd-block-title"><span>⛳</span> On the Course Today</div>`;
-    d.courses.forEach(c=>{
+    courses.forEach(c=>{
       html+=`<div class="dd-course">
         <div class="dd-course-banner ${c.banner}"></div>
         <div class="dd-course-body">
@@ -878,7 +891,7 @@ function openDay(idx){
   const logItems=[];
   if(d.drive) logItems.push({icon:'🚗',label:'Drive / Transit',val:d.drive,sub:'Shuttle / car service arranged'});
   if(d.hotel) logItems.push({icon:'🏨',label:"Tonight's Stay",val:d.hotel,sub:''});
-  if(d.courses.length) logItems.push({icon:'⛳',label:'Rounds Today',val:d.courses.length+' Round'+(d.courses.length>1?'s':''),sub:d.courses.map(c=>c.name).join(' + ')});
+  if(courses.length) logItems.push({icon:'⛳',label:'Rounds Today',val:courses.length+' Round'+(courses.length>1?'s':''),sub:courses.map(c=>c.name).join(' + ')});
   if(logItems.length){
     html+=`<div class="dd-block"><div class="dd-block-title"><span>📋</span> Logistics</div><div class="dd-logistics">`;
     logItems.forEach(l=>{
@@ -888,9 +901,7 @@ function openDay(idx){
   }
 
   if(d.hotel&&d.hotelNote){
-    const hotelLink = d.hotelUrl
-      ? `<a class="dd-hotel-link" href="${d.hotelUrl}" target="_blank" rel="noopener">Visit hotel website ↗</a>`
-      : '';
+    const hotelLink=d.hotelUrl?`<a class="dd-hotel-link" href="${d.hotelUrl}" target="_blank" rel="noopener">Visit hotel website ↗</a>`:'';
     html+=`<div class="dd-block"><div class="dd-block-title"><span>🏨</span> Where You're Staying</div>
     <div class="dd-hotel"><div class="dd-hotel-icon">🏡</div><div>
       <div class="dd-hotel-name">${d.hotel}</div>
@@ -900,25 +911,19 @@ function openDay(idx){
     </div></div></div>`;
   }
 
-  // Course options (Option A / Option B toggle) for days with courseOptions:true
-  if(d.courseOptions && d.courseOptionA && d.courseOptionB){
-    const dayIdx=d.idx;
+  if(d.courseOptions&&d.courseOptionA&&d.courseOptionB){
     html+=`<div class="dd-block"><div class="dd-block-title"><span>🤔</span> Morning Round — Still Being Decided</div>
     <div class="course-options-wrap">
       <div class="course-opts-toggle">
-        <button class="copt-btn active" onclick="switchCourseOpt(${dayIdx},'A',this)">Option A — Corballis</button>
-        <button class="copt-btn" onclick="switchCourseOpt(${dayIdx},'B',this)">Option B — Jameson Links</button>
+        <button class="copt-btn active" onclick="switchCourseOpt(${d.idx},'A',this)">Option A — Corballis</button>
+        <button class="copt-btn" onclick="switchCourseOpt(${d.idx},'B',this)">Option B — Jameson Links</button>
       </div>
-      <div class="copt-panel active" id="copt-${dayIdx}-A">
-        ${courseCardHTML(d.courseOptionA,'Option A — The relaxed warm-up')}
-      </div>
-      <div class="copt-panel" id="copt-${dayIdx}-B">
-        ${courseCardHTML(d.courseOptionB,'Option B — The bigger challenge')}
-      </div>
+      <div class="copt-panel active" id="copt-${d.idx}-A">${courseCardHTML(d.courseOptionA,'Option A — The relaxed warm-up')}</div>
+      <div class="copt-panel" id="copt-${d.idx}-B">${courseCardHTML(d.courseOptionB,'Option B — The bigger challenge')}</div>
     </div></div>`;
   }
 
-  const cityPubs = PUBS_BY_CITY[d.pubsCity];
+  const cityPubs=PUBS_BY_CITY[d.pubsCity];
   if(cityPubs&&cityPubs.pubs.length){
     html+=`<div class="dd-block"><div class="dd-block-title"><span>🍺</span> Pubs, Grub &amp; Evening Plans <span style="font-size:10px;font-weight:400;color:var(--inkf);text-transform:none;letter-spacing:0;margin-left:6px;">${cityPubs.city}</span></div>
     <div class="dd-pubs-grid">${cityPubs.pubs.map(pubHTML).join('')}</div></div>`;
@@ -943,302 +948,219 @@ function closeDay(){
   window.scrollTo(0,0);
 }
 
-/* ============================================================
-   SCORECARD — simplified day-by-day net tally
-   ============================================================ */
-const SC_DAYS = [
-  {date:"Sep 12", courses:"County Louth"},
-  {date:"Sep 13", courses:"Corballis / Jameson Links + Portmarnock"},
-  {date:"Sep 14", courses:"Royal County Down + RCD Annesley"},
-  {date:"Sep 15", courses:"Royal Portrush — Dunluce"},
-  {date:"Sep 16", courses:"Portstewart + Castlerock"},
-  {date:"Sep 17", courses:"Ballyliffin Glashedy"},
-  {date:"Sep 18", courses:"St. Patrick's + Sandy Hills"},
-  {date:"Sep 19", courses:"Cruit Island + Narin & Portnoo"}
-];
-
-let dayRes = {}; // dayRes[i] = 'j' | 'p' | 't' | null
+/* ---------- SCORECARD ---------- */
+let res={};
 
 function buildScorecard(){
-  const wrap = document.getElementById('sc-days');
-  wrap.innerHTML = '';
+  const tb=document.getElementById('mrows');
+  if(!tb) return;
+  tb.innerHTML='';
+  ROUNDS.forEach((r,i)=>{
+    const v=res[i]||null;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="cd">${r.d}</td><td class="cc">${r.c}</td>
+    <td style="text-align:center"><div class="score-btns">
+      <button class="sbtn sbtn-j" onclick="setRes(${i},'j')">J</button>
+      <button class="sbtn sbtn-t" onclick="setRes(${i},'t')">½</button>
+      <button class="sbtn sbtn-p" onclick="setRes(${i},'p')">P</button>
+    </div></td>
+    <td class="rcell" id="r${i}">${renderRes(v)}</td>`;
+    tb.appendChild(tr);
+  });
+  calcScores();
+}
+
+function renderRes(v){
+  if(v==='j') return '<span class="rj">🟢 Juniors</span>';
+  if(v==='p') return '<span class="rp">🔴 Piercers</span>';
+  if(v==='t') return '<span class="rt">½ Halved</span>';
+  return '<span class="rn">—</span>';
+}
+
+function setRes(i,v){
+  res[i]=v;
+  document.getElementById('r'+i).innerHTML=renderRes(v);
+  calcScores();
+  persist();
+}
+
+function calcScores(){
+  let j=0,p=0;
+  Object.values(res).forEach(v=>{if(v==='j')j++;else if(v==='p')p++;else if(v==='t'){j+=0.5;p+=0.5;}});
+  const sj=document.getElementById('sj'), sp=document.getElementById('sp');
+  if(sj) sj.textContent=j%1===0?j:j.toFixed(1);
+  if(sp) sp.textContent=p%1===0?p:p.toFixed(1);
+}
+
+/* ---------- DAY SCORECARD ---------- */
+let dayRes={};
+
+function buildDayScorecard(){
+  const wrap=document.getElementById('sc-days');
+  if(!wrap) return;
+  wrap.innerHTML='';
   SC_DAYS.forEach((d,i)=>{
-    const v = dayRes[i] || null;
-    const div = document.createElement('div');
-    div.className = 'sc-day';
-    div.innerHTML = `
+    const v=dayRes[i]||null;
+    const div=document.createElement('div');
+    div.className='sc-day';
+    div.innerHTML=`
       <div class="sc-day-date">${d.date}</div>
       <div class="sc-day-courses">${d.courses}</div>
       <div class="sc-day-controls">
-        <button class="sc-btn sc-btn-j${v==='j'?' sel':''}" onclick="setDay(${i},'j',this)" title="Juniors win">J</button>
-        <button class="sc-btn sc-btn-t${v==='t'?' sel':''}" onclick="setDay(${i},'t',this)" title="All square">½</button>
-        <button class="sc-btn sc-btn-p${v==='p'?' sel':''}" onclick="setDay(${i},'p',this)" title="Piercers win">P</button>
+        <button class="sc-btn sc-btn-j${v==='j'?' sel':''}" onclick="setDay(${i},'j',this)">J</button>
+        <button class="sc-btn sc-btn-t${v==='t'?' sel':''}" onclick="setDay(${i},'t',this)">½</button>
+        <button class="sc-btn sc-btn-p${v==='p'?' sel':''}" onclick="setDay(${i},'p',this)">P</button>
       </div>
-      <div class="sc-day-net ${v==='j'?'j':v==='p'?'p':'sq'}" id="sc-net-${i}">${dayNetLabel(i)}</div>
-    `;
+      <div class="sc-day-net ${v==='j'?'j':v==='p'?'p':'sq'}" id="sc-net-${i}">${dayNetLabel(i)}</div>`;
     wrap.appendChild(div);
   });
   updateBanner();
 }
 
 function dayNetLabel(upToIdx){
-  let j=0, p=0;
+  let j=0,p=0;
   for(let k=0;k<=upToIdx;k++){
     const v=dayRes[k];
-    if(v==='j') j++;
-    else if(v==='p') p++;
-    else if(v==='t'){j+=0.5;p+=0.5;}
+    if(v==='j')j++;else if(v==='p')p++;else if(v==='t'){j+=0.5;p+=0.5;}
   }
-  const net = j - p;
+  const net=j-p;
   if(net===0) return 'AS';
-  const abs = Math.abs(net);
-  const label = abs%1===0 ? abs.toString() : abs.toFixed(1);
-  return net>0 ? `J +${label}` : `P +${label}`;
+  const absN=Math.abs(net);
+  const lbl=absN%1===0?absN.toString():absN.toFixed(1);
+  return net>0?`J +${lbl}`:`P +${lbl}`;
 }
 
-function setDay(i, v, btn){
-  // Toggle off if already selected
-  dayRes[i] = dayRes[i]===v ? null : v;
-  buildScorecard();
+function setDay(i,v,btn){
+  dayRes[i]=dayRes[i]===v?null:v;
+  buildDayScorecard();
   persist();
 }
 
 function updateBanner(){
-  let j=0, p=0;
-  Object.values(dayRes).forEach(v=>{
-    if(v==='j') j++;
-    else if(v==='p') p++;
-    else if(v==='t'){j+=0.5;p+=0.5;}
-  });
-  document.getElementById('sc-j').textContent = j%1===0?j:j.toFixed(1);
-  document.getElementById('sc-p').textContent = p%1===0?p:p.toFixed(1);
-  const net = j - p;
-  const netEl = document.getElementById('sc-net');
-  if(net===0){ netEl.textContent='All Square'; }
-  else {
-    const abs=Math.abs(net);
-    const label=abs%1===0?abs.toString():abs.toFixed(1);
-    netEl.textContent = net>0 ? `Juniors lead +${label}` : `Piercers lead +${label}`;
+  let j=0,p=0;
+  Object.values(dayRes).forEach(v=>{if(v==='j')j++;else if(v==='p')p++;else if(v==='t'){j+=0.5;p+=0.5;}});
+  const sj=document.getElementById('sc-j'), sp=document.getElementById('sc-p');
+  if(sj) sj.textContent=j%1===0?j:j.toFixed(1);
+  if(sp) sp.textContent=p%1===0?p:p.toFixed(1);
+  const netEl=document.getElementById('sc-net');
+  if(!netEl) return;
+  const net=j-p;
+  if(net===0){netEl.textContent='All Square';}
+  else{
+    const absN=Math.abs(net);
+    const lbl=absN%1===0?absN.toString():absN.toFixed(1);
+    netEl.textContent=net>0?`Juniors lead +${lbl}`:`Piercers lead +${lbl}`;
   }
 }
 
-function g(id){return document.getElementById(id)?.value||'';}
+/* ---------- PERSIST / LOAD ---------- */
+function gv(id){return document.getElementById(id)?.value||'';}
+
 function persist(){
-  try{localStorage.setItem('ire26',JSON.stringify({dayRes}));}catch(e){}
-}
-function saveAll(){
-  persist();
-  const c=document.getElementById('saved');
-  c.style.display='block';
-  setTimeout(()=>c.style.display='none',2500);
-}
-function load(){
   try{
-    const raw=localStorage.getItem('ire26');if(!raw)return;
-    const d=JSON.parse(raw);
-    if(d.dayRes) dayRes=d.dayRes;
+    localStorage.setItem('ire26',JSON.stringify({
+      res, dayRes,
+      p1:gv('p1'),p2:gv('p2'),p3:gv('p3'),p4:gv('p4'),
+      notes:gv('notes')
+    }));
   }catch(e){}
 }
 
-buildPubsTab();
-load();
-buildScorecard();
-loadHcap();
-
-/* ============================================================
-   HANDICAP TAB — simplified: enter index, auto-calculate all courses
-   WHS formula (post April 2024):
-   Course HCP = Index × (Slope/113) + (Course Rating − Par)   → round to nearest whole
-   Playing HCP = round(Course HCP × 0.95)
-   ============================================================ */
-const HCAP_COURSES = [
-  {date:"Sep 12", course:"County Louth (Baltray)",   rating:74.4, slope:131, par:73, note:"White tees"},
-  {date:"Sep 13", course:"Jameson Links",             rating:73.5, slope:130, par:72, note:"White tees"},
-  {date:"Sep 13", course:"Portmarnock GC",            rating:76.5, slope:143, par:72, note:"Blue / championship tees"},
-  {date:"Sep 14", course:"Royal County Down",         rating:75.0, slope:142, par:71, note:"Championship tees"},
-  {date:"Sep 14", course:"RCD Annesley",              rating:68.5, slope:118, par:66, note:"Estimated — no official WHS rating"},
-  {date:"Sep 15", course:"Royal Portrush — Dunluce",  rating:74.5, slope:136, par:71, note:"Medal / visitor tees"},
-  {date:"Sep 16", course:"Portstewart Strand",        rating:74.1, slope:135, par:72, note:"Championship tees"},
-  {date:"Sep 16", course:"Castlerock",                rating:72.2, slope:128, par:73, note:"Medal tees"},
-  {date:"Sep 17", course:"Ballyliffin Glashedy",      rating:75.1, slope:136, par:72, note:"Blue / championship tees"},
-  {date:"Sep 18", course:"St. Patrick's (Rosapenna)", rating:72.8, slope:128, par:71, note:"Medal tees"},
-  {date:"Sep 18", course:"Sandy Hills (Rosapenna)",   rating:73.6, slope:130, par:71, note:"Medal tees"},
-  {date:"Sep 19", course:"Cruit Island",              rating:64.5, slope:108, par:68, note:"9-hole layout played twice"},
-  {date:"Sep 19", course:"Narin & Portnoo",           rating:70.8, slope:122, par:69, note:"Medal tees"}
-];
-
-function chcp(index, slope, rating, par) {
-  if (index === null || isNaN(index)) return null;
-  return Math.round(index * (slope / 113) + (rating - par));
-}
-function phcp(courseHcp) {
-  return courseHcp === null ? null : Math.round(courseHcp * 0.95);
-}
-function getIdx(i) {
-  const v = parseFloat(document.getElementById('hi'+i)?.value);
-  return isNaN(v) ? null : v;
-}
-function getName(i) {
-  return document.getElementById('hn'+i)?.value.trim() || 'Player '+i;
+function saveAll(){
+  persist();
+  const c=document.getElementById('saved');
+  if(c){c.style.display='block';setTimeout(()=>c.style.display='none',2500);}
 }
 
-function refreshAll() {
-  // Update column headers with player names
-  [1,2,3,4].forEach(i => {
-    const th = document.getElementById('hth'+i);
-    if (th) th.innerHTML = getName(i) + '<br><span class="th-sub">HCP / Play</span>';
+function load(){
+  try{
+    const raw=localStorage.getItem('ire26');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d.res) res=d.res;
+    if(d.dayRes) dayRes=d.dayRes;
+    ['p1','p2','p3','p4'].forEach(k=>{if(d[k]!==undefined&&document.getElementById(k))document.getElementById(k).value=d[k];});
+    if(d.notes&&document.getElementById('notes'))document.getElementById('notes').value=d.notes;
+  }catch(e){}
+}
+
+/* ---------- HANDICAP TAB ---------- */
+function chcp(index, slope, rating, par){
+  if(index===null||isNaN(index)) return null;
+  return Math.round(index*(slope/113)+(rating-par));
+}
+function phcp(courseHcp){
+  return courseHcp===null?null:Math.round(courseHcp*0.95);
+}
+function getIdx(i){
+  const v=parseFloat(document.getElementById('hi'+i)?.value);
+  return isNaN(v)?null:v;
+}
+function getHName(i){
+  return document.getElementById('hn'+i)?.value.trim()||'Player '+i;
+}
+
+function refreshAll(){
+  [1,2,3,4].forEach(i=>{
+    const th=document.getElementById('hth'+i);
+    if(th) th.innerHTML=getHName(i)+'<br><span class="th-sub">HCP / Play</span>';
   });
-
-  const tbody = document.getElementById('hcap-body');
-  tbody.innerHTML = '';
-  const indices = [1,2,3,4].map(i => getIdx(i));
-
-  HCAP_COURSES.forEach(c => {
-    const tr = document.createElement('tr');
-    let cells = `
+  const tbody=document.getElementById('hcap-body');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  const indices=[1,2,3,4].map(i=>getIdx(i));
+  HCAP_COURSES.forEach(c=>{
+    const tr=document.createElement('tr');
+    let cells=`
       <td class="date-col">${c.date}</td>
       <td class="course-col">${c.course}<br><span class="course-note">${c.note}</span></td>
       <td class="meta-col ctr">${c.rating}</td>
       <td class="meta-col ctr">${c.slope}</td>
       <td class="meta-col ctr">${c.par}</td>`;
-
-    indices.forEach((idx, pi) => {
-      const ch = chcp(idx, c.slope, c.rating, c.par);
-      const ph = phcp(ch);
-      const clr = pi < 2 ? 'j' : 'p';
-      if (ch === null) {
-        cells += `<td class="hcap-empty">—</td>`;
-      } else {
-        cells += `<td>
-          <div class="hcap-hcp ${clr}">${ch}</div>
-          <div class="hcap-playing">${ph} play</div>
-        </td>`;
-      }
+    indices.forEach((idx,pi)=>{
+      const ch=chcp(idx,c.slope,c.rating,c.par);
+      const ph=phcp(ch);
+      const clr=pi<2?'j':'p';
+      if(ch===null){cells+=`<td class="hcap-empty">—</td>`;}
+      else{cells+=`<td><div class="hcap-hcp ${clr}">${ch}</div><div class="hcap-playing">${ph} play</div></td>`;}
     });
-    tr.innerHTML = cells;
+    tr.innerHTML=cells;
     tbody.appendChild(tr);
   });
-
   saveHcap();
 }
 
-function saveHcap() {
-  try {
-    const data = {};
+function saveHcap(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('ire26')||'{}');
+    const data={};
     for(let i=1;i<=4;i++){
-      data['hn'+i] = document.getElementById('hn'+i)?.value||'';
-      data['hi'+i] = document.getElementById('hi'+i)?.value||'';
+      data['hn'+i]=document.getElementById('hn'+i)?.value||'';
+      data['hi'+i]=document.getElementById('hi'+i)?.value||'';
     }
-    const saved = JSON.parse(localStorage.getItem('ire26')||'{}');
-    saved.hcap = data;
-    localStorage.setItem('ire26', JSON.stringify(saved));
-  } catch(e) {}
+    saved.hcap=data;
+    localStorage.setItem('ire26',JSON.stringify(saved));
+  }catch(e){}
 }
 
-function loadHcap() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('ire26')||'{}');
-    if (!saved.hcap) return;
+function loadHcap(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('ire26')||'{}');
+    if(!saved.hcap) return;
     for(let i=1;i<=4;i++){
-      if(document.getElementById('hn'+i)) document.getElementById('hn'+i).value = saved.hcap['hn'+i]||'';
-      if(document.getElementById('hi'+i)) document.getElementById('hi'+i).value = saved.hcap['hi'+i]||'';
+      if(document.getElementById('hn'+i)) document.getElementById('hn'+i).value=saved.hcap['hn'+i]||'';
+      if(document.getElementById('hi'+i)) document.getElementById('hi'+i).value=saved.hcap['hi'+i]||'';
     }
     refreshAll();
-  } catch(e) {}
+  }catch(e){}
 }
 
+/* ---------- INIT ---------- */
 buildPubsTab();
 load();
 buildScorecard();
+buildDayScorecard();
 loadHcap();
-
-/* ============================================================
-   HANDICAP TAB — Course data & calculations
-   Official WHS formula (post April 2024):
-   Course HCP = Index × (Slope/113) + (Course Rating − Par)
-   Playing HCP = round(Course HCP × 0.95)
-   ============================================================ */
-const HCAP_COURSES = [
-  // Sources: verified from official club WHS pages, coursehandicap.com, bluegolf, golfwrx
-  // White/Medal tees used as standard visitor tee unless noted
-  {date:"Sep 12", course:"County Louth (Baltray)",    rating:74.4, slope:131, par:73, note:"White tees"},
-  {date:"Sep 13", course:"Jameson Links",              rating:73.5, slope:130, par:72, note:"White tees"},
-  {date:"Sep 13", course:"Portmarnock GC",             rating:76.5, slope:143, par:72, note:"Blue/championship tees"},
-  {date:"Sep 14", course:"Royal County Down",          rating:75.0, slope:142, par:71, note:"Championship tees"},
-  {date:"Sep 14", course:"RCD Annesley",               rating:68.5, slope:118, par:66, note:"Est. — no official WHS rating published"},
-  {date:"Sep 15", course:"Royal Portrush — Dunluce",   rating:74.5, slope:136, par:71, note:"Medal/visitor tees"},
-  {date:"Sep 16", course:"Portstewart Strand",         rating:74.1, slope:135, par:72, note:"Championship tees"},
-  {date:"Sep 16", course:"Castlerock",                 rating:72.2, slope:128, par:73, note:"Medal tees"},
-  {date:"Sep 17", course:"Ballyliffin Glashedy",       rating:75.1, slope:136, par:72, note:"Blue/championship tees"},
-  {date:"Sep 18", course:"St. Patrick's (Rosapenna)",  rating:72.8, slope:128, par:71, note:"Medal tees"},
-  {date:"Sep 18", course:"Sandy Hills (Rosapenna)",    rating:73.6, slope:130, par:71, note:"Medal tees"},
-  {date:"Sep 19", course:"Cruit Island",               rating:64.5, slope:108, par:68, note:"9-hole course (18 holes played)"},
-  {date:"Sep 19", course:"Narin & Portnoo",            rating:70.8, slope:122, par:69, note:"Medal tees"}
-];
-
-function calcCourseHcp(index, slope, rating, par) {
-  if (index === null || isNaN(index)) return null;
-  return index * (slope / 113) + (rating - par);
-}
-function calcPlayingHcp(courseHcp) {
-  if (courseHcp === null) return null;
-  return Math.round(courseHcp * 0.95);
-}
-function roundCourseHcp(v) { return Math.round(v); }
-
-function getPlayerName(i) {
-  const v = document.getElementById('hn'+i)?.value.trim();
-  return v || `Player ${i}`;
-}
-function getIndex(i) {
-  const v = parseFloat(document.getElementById('hi'+i)?.value);
-  return isNaN(v) ? null : v;
-}
-
-function refreshAll() {
-  const btn = document.getElementById('refresh-btn');
-  btn.classList.add('loading');
-
-  // Update header names
-  for(let i=1;i<=4;i++){
-    const th = document.getElementById('hth'+i);
-    if(th) th.innerHTML = getPlayerName(i) + '<br><span style="font-weight:400;font-size:9px;opacity:.7">HCP / Playing</span>';
-  }
-
-  const tbody = document.getElementById('hcap-body');
-  tbody.innerHTML = '';
-
-  const indices = [1,2,3,4].map(i => getIndex(i));
-
-  HCAP_COURSES.forEach(c => {
-    const tr = document.createElement('tr');
-    let cells = `
-      <td class="date-col">${c.date}</td>
-      <td class="course-col">${c.course}<br><span style="font-size:10px;color:var(--inkf);font-weight:400">${c.note}</span></td>
-      <td class="meta-col" style="text-align:center">${c.rating}</td>
-      <td class="meta-col" style="text-align:center">${c.slope}</td>
-      <td class="meta-col" style="text-align:center">${c.par}</td>
-    `;
-    [0,1,2,3].forEach((idx,pi) => {
-      const index = indices[idx];
-      const chcp = calcCourseHcp(index, c.slope, c.rating, c.par);
-      const phcp = calcPlayingHcp(chcp);
-      const clr = pi < 2 ? 'j' : 'p';
-      if (chcp === null) {
-        cells += `<td class="hcap-empty">—</td>`;
-      } else {
-        cells += `<td>
-          <div class="hcap-hcp ${clr}">${roundCourseHcp(chcp)}</div>
-          <div class="hcap-playing">${phcp} play</div>
-        </td>`;
-      }
-    });
-    tr.innerHTML = cells;
-    tbody.appendChild(tr);
-  });
-
-
-
 </script>
 </body>
 </html>
